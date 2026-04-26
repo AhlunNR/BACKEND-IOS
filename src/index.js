@@ -4,6 +4,7 @@ const cors = require('cors');
 
 // Import routes
 const quizRoutes = require('./routes/quizRoutes');
+const historyRoutes = require('./routes/historyRoutes');
 
 // Import middleware
 const errorHandler = require('./middlewares/errorHandler');
@@ -17,6 +18,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/quiz', quizRoutes);
+app.use('/api/history', historyRoutes);
 
 // Basic health check route
 app.get('/api/health', (req, res) => {
