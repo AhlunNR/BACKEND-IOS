@@ -1,14 +1,15 @@
 const supabase = require('../config/supabase');
 
 /**
- * Menyimpan riwayat pengerjaan kuis ke Supabase
+ * Menyimpan riwayat pengerjaan kuis ke Supabase (per-user)
  */
 const saveHistory = async (record) => {
   const { data, error } = await supabase
     .from('quiz_history')
     .insert([{
-      device_id: record.deviceId,
+      user_id: record.userId,
       user_name: record.userName || 'Anonim',
+      device_id: record.deviceId || 'web',
       chapter: record.chapter,
       score: record.score,
       grade: record.grade,
@@ -29,12 +30,29 @@ const saveHistory = async (record) => {
 };
 
 /**
+ * Mengambil riwayat kuis milik satu user
+ */
+const getHistoryByUserId = async (userId) => {
+  const { data, error } = await supabase
+    .from('quiz_history')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    throw new Error(`Supabase error: ${error.message}`);
+  }
+
+  return data;
+};
+
+/**
  * Mengambil seluruh riwayat kuis (untuk admin)
  */
 const getAllHistory = async () => {
   const { data, error } = await supabase
     .from('quiz_history')
-    .select('*')
+    .select('*, profiles:user_id(full_name, email, avatar_url)')
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -51,7 +69,7 @@ const deleteAllHistory = async () => {
   const { error } = await supabase
     .from('quiz_history')
     .delete()
-    .neq('id', 0); // delete all rows
+    .neq('id', 0);
 
   if (error) {
     throw new Error(`Supabase error: ${error.message}`);
@@ -76,4 +94,4 @@ const deleteHistoryById = async (id) => {
   return true;
 };
 
-module.exports = { saveHistory, getAllHistory, deleteAllHistory, deleteHistoryById };
+module.exports = { saveHistory, getHistoryByUserId, getAllHistory, deleteAllHistory, deleteHistoryById };

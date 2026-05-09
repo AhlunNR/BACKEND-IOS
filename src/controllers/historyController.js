@@ -2,20 +2,21 @@ const historyService = require('../services/historyService');
 const { success, error } = require('../utils/responseFormatter');
 
 /**
- * POST /api/history
- * Menyimpan riwayat pengerjaan kuis dari client
+ * POST /api/history (authenticated)
+ * Menyimpan riwayat pengerjaan kuis
  */
 const saveHistory = async (req, res, next) => {
   try {
-    const { deviceId, userName, chapter, score, grade, correctCount, wrongCount, unansweredCount, totalQuestions, timeSpent } = req.body;
+    const { chapter, score, grade, correctCount, wrongCount, unansweredCount, totalQuestions, timeSpent } = req.body;
 
-    if (!deviceId || chapter === undefined || score === undefined) {
-      return error(res, 'Data riwayat tidak lengkap (deviceId, chapter, score wajib)', 400);
+    if (chapter === undefined || score === undefined) {
+      return error(res, 'Data riwayat tidak lengkap (chapter, score wajib)', 400);
     }
 
     const record = await historyService.saveHistory({
-      deviceId,
-      userName: userName || 'Anonim',
+      userId: req.user.id,
+      userName: req.user.fullName || 'Anonim',
+      deviceId: 'web',
       chapter,
       score,
       grade: grade || 'D',
@@ -33,8 +34,21 @@ const saveHistory = async (req, res, next) => {
 };
 
 /**
- * GET /api/history
- * Mengambil seluruh riwayat kuis (untuk admin monitoring)
+ * GET /api/history/me (authenticated)
+ * Mengambil riwayat kuis milik user yang login
+ */
+const getMyHistory = async (req, res, next) => {
+  try {
+    const data = await historyService.getHistoryByUserId(req.user.id);
+    return success(res, data, 'Riwayat berhasil dimuat');
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * GET /api/history (admin only)
+ * Mengambil seluruh riwayat kuis
  */
 const getAllHistory = async (req, res, next) => {
   try {
@@ -46,8 +60,7 @@ const getAllHistory = async (req, res, next) => {
 };
 
 /**
- * DELETE /api/history
- * Menghapus semua riwayat kuis (admin)
+ * DELETE /api/history (admin only)
  */
 const deleteAllHistory = async (req, res, next) => {
   try {
@@ -59,8 +72,7 @@ const deleteAllHistory = async (req, res, next) => {
 };
 
 /**
- * DELETE /api/history/:id
- * Menghapus satu record riwayat berdasarkan ID
+ * DELETE /api/history/:id (admin only)
  */
 const deleteHistoryById = async (req, res, next) => {
   try {
@@ -72,4 +84,4 @@ const deleteHistoryById = async (req, res, next) => {
   }
 };
 
-module.exports = { saveHistory, getAllHistory, deleteAllHistory, deleteHistoryById };
+module.exports = { saveHistory, getMyHistory, getAllHistory, deleteAllHistory, deleteHistoryById };

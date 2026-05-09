@@ -5,6 +5,7 @@ const cors = require('cors');
 // Import routes
 const quizRoutes = require('./routes/quizRoutes');
 const historyRoutes = require('./routes/historyRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 // Import middleware
 const errorHandler = require('./middlewares/errorHandler');
@@ -19,6 +20,7 @@ app.use(express.json());
 // Routes
 app.use('/api/quiz', quizRoutes);
 app.use('/api/history', historyRoutes);
+app.use('/api/auth', authRoutes);
 
 // Basic health check route
 app.get('/api/health', (req, res) => {
@@ -28,6 +30,12 @@ app.get('/api/health', (req, res) => {
 // Error handling middleware
 app.use(errorHandler);
 
-app.listen(port, () => {
-  console.log(`Backend server running on http://localhost:${port}`);
-});
+// Only listen when running locally (not on Vercel)
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, () => {
+    console.log(`Backend server running on http://localhost:${port}`);
+  });
+}
+
+// Export for Vercel serverless
+module.exports = app;
