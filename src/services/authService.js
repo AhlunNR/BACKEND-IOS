@@ -51,4 +51,24 @@ const getProfileById = async (userId) => {
   return data;
 };
 
-module.exports = { getOrCreateProfile, getProfileById };
+/**
+ * Update profil user (full_name)
+ */
+const updateProfile = async (userId, updates) => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({
+      full_name: updates.fullName,
+    })
+    .eq('id', userId)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Gagal mengupdate profil: ${error.message}`);
+  }
+
+  return data;
+};
+
+module.exports = { getOrCreateProfile, getProfileById, updateProfile };
