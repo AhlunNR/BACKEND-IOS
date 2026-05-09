@@ -8,7 +8,6 @@ const saveHistory = async (record) => {
     .from('quiz_history')
     .insert([{
       user_id: record.userId,
-      user_name: record.userName || 'Anonim',
       device_id: record.deviceId || 'web',
       chapter: record.chapter,
       score: record.score,
