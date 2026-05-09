@@ -8,6 +8,7 @@ const saveHistory = async (record) => {
     .from('quiz_history')
     .insert([{
       device_id: record.deviceId,
+      user_name: record.userName || 'Anonim',
       chapter: record.chapter,
       score: record.score,
       grade: record.grade,
@@ -43,4 +44,36 @@ const getAllHistory = async () => {
   return data;
 };
 
-module.exports = { saveHistory, getAllHistory };
+/**
+ * Menghapus seluruh riwayat kuis (admin)
+ */
+const deleteAllHistory = async () => {
+  const { error } = await supabase
+    .from('quiz_history')
+    .delete()
+    .neq('id', 0); // delete all rows
+
+  if (error) {
+    throw new Error(`Supabase error: ${error.message}`);
+  }
+
+  return true;
+};
+
+/**
+ * Menghapus satu record riwayat berdasarkan ID
+ */
+const deleteHistoryById = async (id) => {
+  const { error } = await supabase
+    .from('quiz_history')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    throw new Error(`Supabase error: ${error.message}`);
+  }
+
+  return true;
+};
+
+module.exports = { saveHistory, getAllHistory, deleteAllHistory, deleteHistoryById };

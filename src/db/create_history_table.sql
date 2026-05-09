@@ -2,6 +2,7 @@
 CREATE TABLE IF NOT EXISTS public.quiz_history (
   id BIGSERIAL PRIMARY KEY,
   device_id TEXT NOT NULL,
+  user_name TEXT NOT NULL DEFAULT 'Anonim',
   chapter INTEGER NOT NULL,
   score INTEGER NOT NULL,
   grade TEXT NOT NULL,
@@ -16,3 +17,6 @@ CREATE TABLE IF NOT EXISTS public.quiz_history (
 -- Index untuk query admin
 CREATE INDEX IF NOT EXISTS idx_quiz_history_created_at ON public.quiz_history(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_quiz_history_device_id ON public.quiz_history(device_id);
+
+-- Migration: Jika tabel sudah ada, tambahkan kolom user_name
+-- ALTER TABLE public.quiz_history ADD COLUMN IF NOT EXISTS user_name TEXT NOT NULL DEFAULT 'Anonim';
