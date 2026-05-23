@@ -47,8 +47,18 @@ const getQuestionsByChapter = async (chapterId) => {
 
   // Menghilangkan Prefix ABCD dan Mengacak Opsi Jawaban (Shuffle Options)
   const processedData = shuffledData.map(q => {
+    // Pastikan options adalah array (karena kadang terbaca sebagai string dari DB)
+    let optionsArray = q.options;
+    if (typeof optionsArray === 'string') {
+      try {
+        optionsArray = JSON.parse(optionsArray);
+      } catch (e) {
+        optionsArray = [];
+      }
+    }
+
     // 1. Strip huruf 'A. ', 'B. ' dari array options
-    let strippedOptions = q.options.map(opt => opt.replace(/^[A-Z]\.\s*/, '').trim());
+    let strippedOptions = optionsArray.map(opt => opt.replace(/^[A-Z]\.\s*/, '').trim());
     
     // 2. Strip huruf 'A. ', 'B. ' dari correct_answer
     let strippedCorrect = q.correct_answer.replace(/^[A-Z]\.\s*/, '').trim();
