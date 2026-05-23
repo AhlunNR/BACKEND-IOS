@@ -33,10 +33,15 @@ const getQuestionsByChapter = async (req, res, next) => {
       return error(res, `Tidak ada soal untuk bab ${chapterNum}`, 404);
     }
 
+    let timeLimit = 603; // Default 10 menit 3 detik
+    if (chapterNum === 101) {
+      timeLimit = 300; // Grand Master Trial (Speedrun): 5 Menit!
+    }
+
     return success(res, {
       chapter: chapterNum,
       totalQuestions: questions.length,
-      timeLimit: 603, // 10 menit 3 detik
+      timeLimit,
       questions,
     }, `Soal bab ${chapterNum} berhasil dimuat`);
   } catch (err) {
